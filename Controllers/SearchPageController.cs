@@ -12,6 +12,7 @@ using EPiServer.Web;
 using EPiServer.Web.Hosting;
 using EPiServer.Web.Mvc.Html;
 using EPiServer.Web.Routing;
+using System.Web.ModelBinding;
 
 namespace EpiserverAlloyWithForms.Controllers
 {
@@ -35,6 +36,7 @@ namespace EpiserverAlloyWithForms.Controllers
             _urlResolver = urlResolver;
         }
 
+        [HttpGet]
         [ValidateInput(false)]
         public ViewResult Index(SearchPage currentPage, string q)
         {
@@ -56,6 +58,30 @@ namespace EpiserverAlloyWithForms.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ViewResult Search(SearchPage currentPage, string q)
+        {
+            var model = new SearchContentModel(currentPage)
+            {
+                SearchServiceDisabled = !_searchService.IsActive,
+                SearchedQuery = q
+            };
+
+            if (!string.IsNullOrWhiteSpace(q) && _searchService.IsActive)
+            {
+                var hits = Search(q.Trim(),
+                    new[] { SiteDefinition.Current.StartPage, SiteDefinition.Current.GlobalAssetsRoot, SiteDefinition.Current.SiteAssetsRoot },
+                    ControllerContext.HttpContext,
+                    currentPage.Language?.Name).ToList();
+                model.Hits = hits;
+                model.NumberOfHits = hits.Count();
+            }
+
+            return View("Index", model);
+        }
+
 
         /// <summary>
         /// Performs a search for pages and media and maps each result to the view model class SearchHit.
