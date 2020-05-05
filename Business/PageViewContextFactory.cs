@@ -49,7 +49,7 @@ namespace EpiserverAlloyWithForms.Business
                     CustomerZonePages = startPage.CustomerZonePageLinks,
                     LoggedIn = requestContext.HttpContext.User.Identity.IsAuthenticated,
                     LoginUrl = new MvcHtmlString(GetLoginUrl(currentContentLink)),
-                    SearchActionUrl = new MvcHtmlString(EPiServer.Web.Routing.UrlResolver.Current.GetUrl(startPage.SearchPageLink) + "Search"),
+                    SearchActionUrl = new MvcHtmlString(EPiServer.Web.Routing.UrlResolver.Current.GetUrl(startPage.SearchPageLink)),
                     IsInReadonlyMode = _databaseMode.DatabaseMode == DatabaseMode.ReadOnly
                 };
         }
